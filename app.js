@@ -89,27 +89,40 @@ let profileUsername = document.getElementById("profile-user-name");
 let profileEmail = document.getElementById("profile-email");
 
 let getBlogData = (uid) => {
-    console.log( uid)
+    console.log(uid)
     let id = uid;
     const q = query(collection(db, "blogs"), where("user_uid", "==", id));
     const unsubscribe = onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
             console.log(change.doc.data())
             dashboardAddBlog.innerHTML += `
-             <div class="flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto  max-w-md md:max-w-2xl mt-5 ">
-           
-           <div class="flex items-start px-4 py-6">
-             
-              <div class="">
-                 <div class="flex items-center justify-between ">
-                    <h2 class="text-lg font-semibold text-gray-900 -mt-1">${change.doc.data().blog_title} </h2>
-                    <small class="text-sm text-gray-700">22h ago</small>
+                
+              <div class="flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto mt-4 max-w-md md:max-w-2xl ">
+              <div class="flex bg-white items-start px-4 py-6 w-[100%] border-2 ">
+                 <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="https://images.unsplash.com/photo-1542156822-6924d1a71ace?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="avatar">
+                 <div class=" w-[100%]">
+                    <div class="flex items-center justify-between w-[100%]">
+                       <h2 class="text-lg -mt-1 font-bold">${change.doc.data().user_name}  </h2>
+                       <small class="text-sm text-gray-700">22h ago</small>
+                       <p class="text-gray-700">Joined 12 SEP 2012. </p>
+                       </div>
+                    
+                    <h1 class="font-bold text-2xl">${change.doc.data().blog_title}</h1>
+                    <p class="mt-3 text-gray-700 text-sm">
+                    ${change.doc.data().blog_description}
+                    </p>
+                   
                  </div>
-                 <p class="text-gray-700">Joined 12 SEP 2012. </p>
-                 <p class="mt-3 text-gray-700 text-sm">
-               <div>${change.doc.data().blog_description}</div>
-               
-                 </p>
+              </div>
+           </div>
+
+
+
+
+
+
+
+
              `
         });
     });
@@ -214,8 +227,8 @@ if (location.pathname == "/dashboard.html") {
                     const docRef = await addDoc(collection(db, "blogs"), {
                         blog_title: blogTitle.value,
                         blog_description: quill.root.innerHTML,
-                        user_uid:doc.data().user_uid,
-                        user_name:doc.data().signup_user_name
+                        user_uid: doc.data().user_uid,
+                        user_name: doc.data().signup_user_name
                     });
                     console.log("Document written with ID: ", docRef.id)
                     getBlogData()
