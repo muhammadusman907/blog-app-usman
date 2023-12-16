@@ -2,10 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 // ==============================================================================
 // ========================================= authentication ===================== 
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword ,onAuthStateChanged ,signOut  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 // ==============================================================================
 // =================================== fire store =============================== 
-import { getFirestore, collection, addDoc , doc, onSnapshot,setDoc,getDoc , query, where} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+    getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCNLLVAJDsvgEujEbHWjHTykGL5O-HDPQE",
@@ -23,6 +25,7 @@ const analytics = getAnalytics(app)
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-export { auth, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,onAuthStateChanged ,signOut ,
-     db, getFirestore, collection, addDoc ,doc, onSnapshot,setDoc ,getDoc,query, where
-    }
+export {
+    auth, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut,
+    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc
+}

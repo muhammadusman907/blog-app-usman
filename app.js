@@ -1,6 +1,6 @@
 import {
     getAuth, createUserWithEmailAndPassword, auth, signInWithEmailAndPassword, onAuthStateChanged, signOut,
-    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where
+    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where,updateDoc 
 } from "./firebase.js";
 // ==========================================================================
 // ================================ signup create user ======================
@@ -95,8 +95,9 @@ let getBlogData = (uid) => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
             console.log(change.doc.data())
-            dashboardAddBlog.innerHTML += `
-                
+            if (location.pathname == "/dashboard.html") {
+                dashboardAddBlog.innerHTML += `
+        
               <div class="flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto mt-4 max-w-md md:max-w-2xl ">
               <div class="flex bg-white items-start px-4 py-6 w-[100%] border-2 ">
                  <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="https://images.unsplash.com/photo-1542156822-6924d1a71ace?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="avatar">
@@ -115,67 +116,112 @@ let getBlogData = (uid) => {
                  </div>
               </div>
            </div>
-
-
-
-
-
-
-
-
-             `
+           `
+            }
         });
     });
 
 }
+// ========================================================================
+// =============================== index page  ============================
+// ========================================================================
+let allUserBlog = document.getElementById("all-user-blog")
+let getAllBlog = () => {
+    // console.log()
+    // let id = allUserId;
+    const unsubscribe = onSnapshot(collection(db, "blogs"), (getAllUser) => {
+        // Respond to data
+        console.log(getAllUser.docs);
+        getAllUser.docs.forEach((loopForAllUser) => {
+            console.log(loopForAllUser.data())
+            if (location.pathname == "/index.html") {
+                allUserBlog.innerHTML += `
+        
+              <div class="flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto mt-4 max-w-md md:max-w-2xl ">
+              <div class="flex bg-white items-start px-4 py-6 w-[100%] border-2 ">
+                 <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="https://images.unsplash.com/photo-1542156822-6924d1a71ace?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="avatar">
+                 <div class=" w-[100%]">
+                    <div class="flex items-center justify-between w-[100%]">
+                       <h2 class="text-lg -mt-1 font-bold">${loopForAllUser.data().user_name}  </h2>
+                       <small class="text-sm text-gray-700">22h ago</small>
+                       <p class="text-gray-700">Joined 12 SEP 2012. </p>
+                       </div>
+                    
+                    <h1 class="font-bold text-2xl">${loopForAllUser.data().blog_title}</h1>
+                    <p class="mt-3 text-gray-700 text-sm">
+                    ${loopForAllUser.data().blog_description}
+                    </p>
+                   
+                 </div>
+              </div>
+           </div>
+           `
+            }
+
+        })
+
+    });
+
+
+
+
+}
+getAllBlog()
+
 // getBlogData()
 onAuthStateChanged(auth, (user) => {
     console.log(location.pathname)
 
     //  ========================
     //  2 : CHECK CONDITON  
-    console.log(user)
-    getBlogData(user.uid)
-    const docRef = doc(db, "userData", auth.currentUser.uid);
-    let profilePage = async () => {
+    if (user) {
+        const docRef = doc(db, "userData", auth.currentUser.uid)
+
+        let profilePage = async () => {
 
 
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            console.log("Document data:", docSnap.data().user_uid);
+            const docSnap = await getDoc(docRef)
+            if (docSnap.exists()) {
+                console.log("Document data:", docSnap.data().user_uid);
 
-            if (user && docSnap.data().user_uid) {
-                const uid = user.uid;
-                //  CHANGE LOCATION 
-                //  debugger
-                if (location.pathname !== "/profile.html" && location.pathname !== "/dashboard.html") {
-                    location.href = "./profile.html";
+                if (user && docSnap.data().user_uid) {
+                    getBlogData(user.uid)
+                    const uid = user.uid;
+                    //  CHANGE LOCATION 
+                    //  debugger
+                    if (location.pathname !== "/profile.html" && location.pathname !== "/dashboard.html" &&
+                        location.pathname !== "/index.html"
+                    ) {
+                        location.href = "./profile.html";
 
+                    }
+                    else if (location.pathname == "/profile.html") {
+                        console.log(profileUsername)
+                        profileUsername.innerHTML = docSnap.data().signup_user_name;
+                        profileEmail.innerHTML = docSnap.data().signup_email;
+                        console.log("Current data------>: ", docSnap.data());
+                    }
+                    // console.log(uid)
                 }
-                else if (location.pathname == "/profile.html") {
-                    console.log(profileUsername)
-                    profileUsername.innerHTML = docSnap.data().signup_user_name;
-                    profileEmail.innerHTML = docSnap.data().signup_email;
-                    console.log("Current data------>: ", docSnap.data());
-                }
-                // console.log(uid)
             } else {
-                if (location.pathname !== "/login.html" &&
-                    location.pathname !== "/signup.html" &&
-                    location.pathname !== "/dashboard.html"
-                ) {
-                    window.location.href = "./login.html"
-                }
-                // User is signed out
-                // ...
+                // docSnap.data() will be undefined in this case
+                console.log("No such document!");
+
             }
-        } else {
-            // docSnap.data() will be undefined in this case
-            console.log("No such document!");
+        }
+        profilePage()
+    }
+    else {
+        if (location.pathname !== "/login.html" &&
+            location.pathname !== "/signup.html" &&
+            location.pathname !== "/index.html" 
+        ) {
+            window.location.href = "./login.html"
         }
     }
-    profilePage()
-});
+}
+
+);
 
 // =====================================================================
 // ====================================== Logout =======================
