@@ -94,7 +94,7 @@ let getBlogData = (uid) => {
     const q = query(collection(db, "blogs"), where("user_uid", "==", id));
     const unsubscribe = onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-            console.log(change.doc.data())
+            console.log(change.doc)
             if (location.pathname == "/dashboard.html") {
                 dashboardAddBlog.innerHTML += `
         
@@ -105,14 +105,15 @@ let getBlogData = (uid) => {
                     <div class="flex items-center justify-between w-[100%]">
                        <h2 class="text-lg -mt-1 font-bold">${change.doc.data().user_name}  </h2>
                        <small class="text-sm text-gray-700">22h ago</small>
-                       <p class="text-gray-700">Joined 12 SEP 2012. </p>
+                       <p class="text-gray-700">Joined 12 SEP 2012.</p>
                        </div>
                     
                     <h1 class="font-bold text-2xl">${change.doc.data().blog_title}</h1>
-                    <p class="mt-3 text-gray-700 text-sm">
+                    <p class="mt-3 text-gray-700 text-sm mb-5">
                     ${change.doc.data().blog_description}
                     </p>
-                   
+                    <button class="text-purple-800" id="update-value" onclick="updateBlog('${change.doc.id}')">Update</button>
+                    <button class="mx-3 text-red-800">Delete</button>
                  </div>
               </div>
            </div>
@@ -250,6 +251,9 @@ if (location.pathname == "/dashboard.html") {
     var quill = new Quill('#editor', {
         theme: 'snow'
     });
+    var quill1 = new Quill('#editor1', {
+        theme: 'snow'
+    });
     // ==================================================================
     // ======================== SUBMIT BLOG =============================
     // ==================================================================
@@ -291,5 +295,32 @@ if (location.pathname == "/dashboard.html") {
     // ================================= GET DATA USER BLOG DASHBOARD
     // ==============================================================
 
-
 }
+let editBlogBtn = document.getElementById("edit-blog")
+let editBlog = (id) =>{
+  console.log("edit value id ----->",id)
+   // const washingtonRef = doc(db, "blogs", "DC");
+    // // Set the "capital" field of the city 'DC'
+    // await updateDoc(washingtonRef, {
+    //   capital: true
+    // });
+}
+editBlogBtn.addEventListener("click", editBlog)
+let editDivShow = document.getElementById("edit-value-show");
+
+let updateBlog = async(userDocId) => {
+    editBlog(userDocId)
+   editDivShow.style.display = "flex";
+    console.log("heloo")
+    console.log(userDocId);
+    
+}
+let closeBtn = document.getElementById("close-btn");
+console.log(closeBtn);
+ closeBtn.addEventListener("click",()=>{
+   editDivShow.style.display = "none";
+   console.log("hello");
+}
+)
+
+window.updateBlog = updateBlog ;
