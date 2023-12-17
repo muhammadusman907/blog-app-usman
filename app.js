@@ -1,6 +1,6 @@
 import {
     getAuth, createUserWithEmailAndPassword, auth, signInWithEmailAndPassword, onAuthStateChanged, signOut,
-    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where,updateDoc 
+    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc
 } from "./firebase.js";
 // ==========================================================================
 // ================================ signup create user ======================
@@ -89,35 +89,77 @@ let profileUsername = document.getElementById("profile-user-name");
 let profileEmail = document.getElementById("profile-email");
 
 let getBlogData = (uid) => {
-    console.log(uid)
+    console.log(uid);
     let id = uid;
     const q = query(collection(db, "blogs"), where("user_uid", "==", id));
     const unsubscribe = onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-            console.log(change.doc)
-            if (location.pathname == "/dashboard.html") {
-                dashboardAddBlog.innerHTML += `
+            console.log(change.doc);
+            //   dashboardAddBlog.innerHTML = "";
+            if (change.type === "added") {
+                console.log("New city: ", change.doc.data());
+                if (location.pathname == "/dashboard.html") {
+                    dashboardAddBlog.innerHTML += `
         
-              <div class="flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto mt-4 max-w-md md:max-w-2xl ">
-              <div class="flex bg-white items-start px-4 py-6 w-[100%] border-2 ">
-                 <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="https://images.unsplash.com/photo-1542156822-6924d1a71ace?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="avatar">
-                 <div class=" w-[100%]">
-                    <div class="flex items-center justify-between w-[100%]">
-                       <h2 class="text-lg -mt-1 font-bold">${change.doc.data().user_name}  </h2>
-                       <small class="text-sm text-gray-700">22h ago</small>
-                       <p class="text-gray-700">Joined 12 SEP 2012.</p>
-                       </div>
-                    
-                    <h1 class="font-bold text-2xl">${change.doc.data().blog_title}</h1>
-                    <p class="mt-3 text-gray-700 text-sm mb-5">
-                    ${change.doc.data().blog_description}
-                    </p>
-                    <button class="text-purple-800" id="update-value" onclick="updateBlog('${change.doc.id}')">Update</button>
-                    <button class="mx-3 text-red-800">Delete</button>
-                 </div>
-              </div>
-           </div>
-           `
+                <div class="flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto mt-4 max-w-md md:max-w-2xl ">
+                <div class="flex bg-white items-start px-4 py-6 w-[100%] border-2 ">
+                   <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="https://images.unsplash.com/photo-1542156822-6924d1a71ace?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="avatar">
+                   <div class=" w-[100%]">
+                      <div class="flex items-center justify-between w-[100%]">
+                         <h2 class="text-lg -mt-1 font-bold">${change.doc.data().user_name}  </h2>
+                         <small class="text-sm text-gray-700">22h ago</small>
+                         <p class="text-gray-700">Joined 12 SEP 2012.</p>
+                         </div>
+                      
+                      <h1 class="font-bold text-2xl">${change.doc.data().blog_title}</h1>
+                      <p class="mt-3 text-gray-700 text-sm mb-5">
+                      ${change.doc.data().blog_description}
+                      </p>
+                      <button class="text-purple-800" id="update-value" onclick="updateBlog('${change.doc.id}')">Update</button>
+                      <button class="mx-3 text-red-800" id="${change.doc.id}" onclick="deleteBlog(this ,'${change.doc.id}')">Delete</button>
+                   </div>
+                </div>
+             </div>
+             `
+                }
+
+            }
+            if (change.type === "modified") {
+                console.log("Modified city: ", change.doc.data());
+                if (location.pathname == "/dashboard.html") {
+
+                    dashboardAddBlog.innerHTML += `
+        
+                <div class="flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto mt-4 max-w-md md:max-w-2xl ">
+                <div class="flex bg-white items-start px-4 py-6 w-[100%] border-2 ">
+                   <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="https://images.unsplash.com/photo-1542156822-6924d1a71ace?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="avatar">
+                   <div class=" w-[100%]">
+                      <div class="flex items-center justify-between w-[100%]">
+                         <h2 class="text-lg -mt-1 font-bold">${change.doc.data().user_name}  </h2>
+                         <small class="text-sm text-gray-700">22h ago</small>
+                         <p class="text-gray-700">Joined 12 SEP 2012.</p>
+                         </div>
+                      
+                      <h1 class="font-bold text-2xl">${change.doc.data().blog_title}</h1>
+                      <p class="mt-3 text-gray-700 text-sm mb-5">
+                      ${change.doc.data().blog_description}
+                      </p>
+                      <button class="text-purple-800" id="update-value" onclick="updateBlog('${change.doc.id}')">Update</button>
+                      <button class="mx-3 text-red-800" id="${change.doc.id}" onclick="deleteBlog('${change.doc.id}')">Delete</button>
+                   </div>
+                </div>
+             </div>
+             `
+                }
+
+            }
+            if (change.type === "removed") {
+                dashboardAddBlog.innerHTML = "";
+                console.log("Removed city: ", change.doc.data());
+                if (location.pathname == "/dashboard.html") {
+             
+                }
+
             }
         });
     });
@@ -215,7 +257,7 @@ onAuthStateChanged(auth, (user) => {
     else {
         if (location.pathname !== "/login.html" &&
             location.pathname !== "/signup.html" &&
-            location.pathname !== "/index.html" 
+            location.pathname !== "/index.html"
         ) {
             window.location.href = "./login.html"
         }
@@ -296,31 +338,54 @@ if (location.pathname == "/dashboard.html") {
     // ==============================================================
 
 }
-let editBlogBtn = document.getElementById("edit-blog")
-let editBlog = (id) =>{
-  console.log("edit value id ----->",id)
-   // const washingtonRef = doc(db, "blogs", "DC");
-    // // Set the "capital" field of the city 'DC'
-    // await updateDoc(washingtonRef, {
-    //   capital: true
-    // });
+
+let upadteID = "";
+let editDivShow = document.getElementById("edit-value-show");
+let updateBlogTitle = document.getElementById("update-blog-title");
+
+let updateBlog = async (userDocId) => {
+    // PASS ID UPDATE DOC ====================
+    upadteID = userDocId;
+    editDivShow.style.display = "flex";
+    console.log(userDocId);
+
+}
+
+let editBlogBtn = document.getElementById("edit-blog");
+let editBlog = async () => {
+    console.log("edit value id ----->", upadteID)
+    console.log(updateBlogTitle.value)
+    console.log(quill.root.innerHTML);
+    const blogRef = doc(db, "blogs", upadteID);
+    // UPDATE BLOG TITTLE AND VALUE
+    await updateDoc(blogRef, {
+        blog_description: quill1.root.innerHTML,
+        blog_title: updateBlogTitle.value
+    });
+    editDivShow.style.display = "none";
+    getBlogData()
 }
 editBlogBtn.addEventListener("click", editBlog)
-let editDivShow = document.getElementById("edit-value-show");
+// ====================================================
+// ================ DELETE BLOG  ======================
+// ====================================================
 
-let updateBlog = async(userDocId) => {
-    editBlog(userDocId)
-   editDivShow.style.display = "flex";
-    console.log("heloo")
-    console.log(userDocId);
+let deleteBlog = async (deleteId,e) => {
+    console.log(deleteId, "delete Id -------------->");
+    console.log(e , "delete Id -------------->");
+    // await deleteDoc(doc(db, "blogs", deleteId));
     
+    // getBlogData()
 }
+
+
 let closeBtn = document.getElementById("close-btn");
 console.log(closeBtn);
- closeBtn.addEventListener("click",()=>{
-   editDivShow.style.display = "none";
-   console.log("hello");
+closeBtn.addEventListener("click", () => {
+    editDivShow.style.display = "none";
+    console.log("hello");
 }
 )
 
-window.updateBlog = updateBlog ;
+window.updateBlog = updateBlog;
+window.deleteBlog = deleteBlog;
