@@ -6,7 +6,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, on
 // ==============================================================================
 // =================================== fire store =============================== 
 import {
-    getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc
+    getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc,serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -27,5 +27,5 @@ const db = getFirestore(app);
 
 export {
     auth, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut,
-    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc
+    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc ,serverTimestamp 
 }

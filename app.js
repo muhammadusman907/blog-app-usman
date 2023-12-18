@@ -1,6 +1,6 @@
 import {
     getAuth, createUserWithEmailAndPassword, auth, signInWithEmailAndPassword, onAuthStateChanged, signOut,
-    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc
+    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc,serverTimestamp 
 } from "./firebase.js";
 // ==========================================================================
 // ================================ signup create user ======================
@@ -94,8 +94,8 @@ let getBlogData = (uid) => {
     const q = query(collection(db, "blogs"), where("user_uid", "==", id));
     const unsubscribe = onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-            console.log(change.doc);
-            //   dashboardAddBlog.innerHTML = "";
+            dashboardAddBlog.innerHTML="";
+            console.log("time stamp=====", new Date (change.doc.data().timestamp.nanoseconds));
             if (change.type === "added") {
                 console.log("New city: ", change.doc.data());
                 if (location.pathname == "/dashboard.html") {
@@ -108,7 +108,7 @@ let getBlogData = (uid) => {
                       <div class="flex items-center justify-between w-[100%]">
                          <h2 class="text-lg -mt-1 font-bold">${change.doc.data().user_name}  </h2>
                          <small class="text-sm text-gray-700">22h ago</small>
-                         <p class="text-gray-700">Joined 12 SEP 2012.</p>
+                         <p class="text-gray-700">${change.doc.data().timestamp.toString()}</p>
                          </div>
                       
                       <h1 class="font-bold text-2xl">${change.doc.data().blog_title}</h1>
@@ -137,7 +137,7 @@ let getBlogData = (uid) => {
                       <div class="flex items-center justify-between w-[100%]">
                          <h2 class="text-lg -mt-1 font-bold">${change.doc.data().user_name}  </h2>
                          <small class="text-sm text-gray-700">22h ago</small>
-                         <p class="text-gray-700">Joined 12 SEP 2012.</p>
+                         <p class="text-gray-700">${change.doc.data().timestamp.toString()}</p>
                          </div>
                       
                       <h1 class="font-bold text-2xl">${change.doc.data().blog_title}</h1>
@@ -154,7 +154,6 @@ let getBlogData = (uid) => {
 
             }
             if (change.type === "removed") {
-                dashboardAddBlog.innerHTML = "";
                 console.log("Removed city: ", change.doc.data());
                 if (location.pathname == "/dashboard.html") {
              
@@ -187,7 +186,7 @@ let getAllBlog = () => {
                     <div class="flex items-center justify-between w-[100%]">
                        <h2 class="text-lg -mt-1 font-bold">${loopForAllUser.data().user_name}  </h2>
                        <small class="text-sm text-gray-700">22h ago</small>
-                       <p class="text-gray-700">Joined 12 SEP 2012. </p>
+                       <p class="text-gray-700">${change.doc.data().timestamp.toString()} </p>
                        </div>
                     
                     <h1 class="font-bold text-2xl">${loopForAllUser.data().blog_title}</h1>
@@ -320,7 +319,9 @@ if (location.pathname == "/dashboard.html") {
                         blog_title: blogTitle.value,
                         blog_description: quill.root.innerHTML,
                         user_uid: doc.data().user_uid,
-                        user_name: doc.data().signup_user_name
+                        user_name: doc.data().signup_user_name,
+                        timestamp: serverTimestamp()
+
                     });
                     console.log("Document written with ID: ", docRef.id)
                     getBlogData()
@@ -370,10 +371,11 @@ editBlogBtn.addEventListener("click", editBlog)
 // ================ DELETE BLOG  ======================
 // ====================================================
 
-let deleteBlog = async (deleteId,e) => {
+let deleteBlog = async (e,deleteId) => {
     console.log(deleteId, "delete Id -------------->");
-    console.log(e , "delete Id -------------->");
-    // await deleteDoc(doc(db, "blogs", deleteId));
+    console.log(e.parentNode.parentNode , "delete Id -------------->");
+    await deleteDoc(doc(db, "blogs", deleteId));
+    e.parentNode.parentNode.remove();
     
     // getBlogData()
 }
