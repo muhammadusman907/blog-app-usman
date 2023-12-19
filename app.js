@@ -89,15 +89,17 @@ let profileUsername = document.getElementById("profile-user-name");
 let profileEmail = document.getElementById("profile-email");
 
 let getBlogData = (uid) => {
+    if (location.pathname == "/dashboard.html") {
+    dashboardAddBlog.innerHTML = "";
+}
     console.log(uid);
     let id = uid;
-    const q = query(collection(db, "blogs"), where("user_uid", "==", id));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+       const q = query(collection(db, "blogs"), where("user_uid", "==", id));
+         const unsubscribe = onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-            dashboardAddBlog.innerHTML="";
-            console.log("time stamp=====", new Date (change.doc.data().timestamp.nanoseconds));
-            if (change.type === "added") {
-                console.log("New city: ", change.doc.data());
+        
+            // console.log("time stamp=====",change.doc.data().timestamp.toDate());
+            
                 if (location.pathname == "/dashboard.html") {
                     dashboardAddBlog.innerHTML += `
         
@@ -108,7 +110,7 @@ let getBlogData = (uid) => {
                       <div class="flex items-center justify-between w-[100%]">
                          <h2 class="text-lg -mt-1 font-bold">${change.doc.data().user_name}  </h2>
                          <small class="text-sm text-gray-700">22h ago</small>
-                         <p class="text-gray-700">${change.doc.data().timestamp.toString()}</p>
+                         <p class="text-gray-700">${change.doc.data().timestamp.toDate().toString().slice(0,10)}</p>
                          </div>
                       
                       <h1 class="font-bold text-2xl">${change.doc.data().blog_title}</h1>
@@ -121,45 +123,10 @@ let getBlogData = (uid) => {
                 </div>
              </div>
              `
-                }
-
+                
             }
-            if (change.type === "modified") {
-                console.log("Modified city: ", change.doc.data());
-                if (location.pathname == "/dashboard.html") {
-
-                    dashboardAddBlog.innerHTML += `
-        
-                <div class="flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto mt-4 max-w-md md:max-w-2xl ">
-                <div class="flex bg-white items-start px-4 py-6 w-[100%] border-2 ">
-                   <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="https://images.unsplash.com/photo-1542156822-6924d1a71ace?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="avatar">
-                   <div class=" w-[100%]">
-                      <div class="flex items-center justify-between w-[100%]">
-                         <h2 class="text-lg -mt-1 font-bold">${change.doc.data().user_name}  </h2>
-                         <small class="text-sm text-gray-700">22h ago</small>
-                         <p class="text-gray-700">${change.doc.data().timestamp.toString()}</p>
-                         </div>
-                      
-                      <h1 class="font-bold text-2xl">${change.doc.data().blog_title}</h1>
-                      <p class="mt-3 text-gray-700 text-sm mb-5">
-                      ${change.doc.data().blog_description}
-                      </p>
-                      <button class="text-purple-800" id="update-value" onclick="updateBlog('${change.doc.id}')">Update</button>
-                      <button class="mx-3 text-red-800" id="${change.doc.id}" onclick="deleteBlog('${change.doc.id}')">Delete</button>
-                   </div>
-                </div>
-             </div>
-             `
-                }
-
-            }
-            if (change.type === "removed") {
-                console.log("Removed city: ", change.doc.data());
-                if (location.pathname == "/dashboard.html") {
-             
-                }
-
-            }
+         
+         
         });
     });
 
@@ -173,7 +140,7 @@ let getAllBlog = () => {
     // let id = allUserId;
     const unsubscribe = onSnapshot(collection(db, "blogs"), (getAllUser) => {
         // Respond to data
-        console.log(getAllUser.docs);
+        // console.log(getAllUser.docs);
         getAllUser.docs.forEach((loopForAllUser) => {
             console.log(loopForAllUser.data())
             if (location.pathname == "/index.html") {
@@ -186,7 +153,7 @@ let getAllBlog = () => {
                     <div class="flex items-center justify-between w-[100%]">
                        <h2 class="text-lg -mt-1 font-bold">${loopForAllUser.data().user_name}  </h2>
                        <small class="text-sm text-gray-700">22h ago</small>
-                       <p class="text-gray-700">${change.doc.data().timestamp.toString()} </p>
+                       <p class="text-gray-700"> </p>
                        </div>
                     
                     <h1 class="font-bold text-2xl">${loopForAllUser.data().blog_title}</h1>
@@ -272,7 +239,7 @@ let logOutBtn = document.getElementById("logout-btn");
 logOutBtn && logOutBtn.addEventListener("click", () => {
     signOut(auth).then(() => {
         // Sign-out successful.
-        location.href = "./login.html";
+        location.href = "./index.html";
     }).catch((error) => {
         // An error happened.
     });
@@ -364,9 +331,9 @@ let editBlog = async () => {
         blog_title: updateBlogTitle.value
     });
     editDivShow.style.display = "none";
-    getBlogData()
+    getBlogData(auth.currentUser.uid)
 }
-editBlogBtn.addEventListener("click", editBlog)
+editBlogBtn && editBlogBtn.addEventListener("click", editBlog)
 // ====================================================
 // ================ DELETE BLOG  ======================
 // ====================================================
@@ -376,6 +343,7 @@ let deleteBlog = async (e,deleteId) => {
     console.log(e.parentNode.parentNode , "delete Id -------------->");
     await deleteDoc(doc(db, "blogs", deleteId));
     e.parentNode.parentNode.remove();
+    getBlogData(auth.currentUser.uid)
     
     // getBlogData()
 }
@@ -383,7 +351,7 @@ let deleteBlog = async (e,deleteId) => {
 
 let closeBtn = document.getElementById("close-btn");
 console.log(closeBtn);
-closeBtn.addEventListener("click", () => {
+closeBtn && closeBtn.addEventListener("click", () => {
     editDivShow.style.display = "none";
     console.log("hello");
 }
