@@ -6,8 +6,10 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, on
 // ==============================================================================
 // =================================== fire store =============================== 
 import {
-    getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc,serverTimestamp 
+    getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc,serverTimestamp ,getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// =============================== image-storage =====================
+import { getStorage, ref , uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCNLLVAJDsvgEujEbHWjHTykGL5O-HDPQE",
@@ -24,8 +26,11 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app)
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage();
+
 
 export {
     auth, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut,
-    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc ,serverTimestamp 
+    db, getFirestore, collection, addDoc, doc, onSnapshot, setDoc, getDoc, query, where, updateDoc, deleteDoc ,serverTimestamp ,getDocs,
+    getStorage, ref , uploadBytesResumable, getDownloadURL,storage
 }
