@@ -115,7 +115,7 @@ let getBlogData = async (uid) => {
 
         <div class="flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto mt-4 max-w-md md:max-w-2xl ">
         <div class="flex bg-white items-start px-4 py-6 w-[100%] border-2 ">
-           <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="https://images.unsplash.com/photo-1542156822-6924d1a71ace?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="avatar">
+           <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="${doc.data().photoUrl}" alt="avatar">
            <div class=" w-[100%]">
               <div class="flex items-center justify-between w-[100%]">
                  <h2 class="text-lg -mt-1 font-bold">${doc.data().user_name}  </h2>
@@ -163,6 +163,9 @@ let allUserBlog = document.getElementById("all-user-blog")
 let getAllBlog = () => {
     // console.log()
     // let id = allUserId;
+   if(location.pathname == "/index.html"){
+ allUserBlog.innerHTML = "";
+ }   
     const unsubscribe = onSnapshot(collection(db, "blogs"), (getAllUser) => {
         // Respond to data
         // console.log(getAllUser.docs);
@@ -173,7 +176,7 @@ let getAllBlog = () => {
         
               <div class="flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto mt-4 max-w-md md:max-w-2xl ">
               <div class="flex bg-white items-start px-4 py-6 w-[100%] border-2 ">
-                 <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="https://images.unsplash.com/photo-1542156822-6924d1a71ace?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="avatar">
+                 <img class="w-12 h-12 rounded-full object-cover mr-4 shadow" src="${loopForAllUser.data().photoUrl}" alt="avatar">
                  <div class=" w-[100%]">
                     <div class="flex items-center justify-between w-[100%]">
                        <h2 class="text-lg -mt-1 font-bold">${loopForAllUser.data().user_name}  </h2>
@@ -224,7 +227,7 @@ let imageUploadFunction = (file) => {
         };
 
         // Upload file and metadata to the object 'images/mountains.jpg'
-        const storageRef = ref(storage, 'images/' + file);
+        const storageRef = ref(storage, 'images/' + file.name);
         const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
         // Listen for state changes, errors, and completion of the upload.
@@ -279,6 +282,11 @@ imageFile && imageFile.addEventListener('change', async() => {
     console.log(event.target.files[0]);
    let imageData = await imageUploadFunction(event.target.files[0])
    console.log(imageData)
+   const washingtonRef = doc(db, "userData", auth.currentUser.uid);
+// Set the "capital" field of the city 'DC'
+await updateDoc(washingtonRef, {
+     photoUrl:imageData
+});
     profileImage.src = imageData;
 })
 updateProfileBtn && updateProfileBtn.addEventListener("click", () => {
@@ -317,6 +325,7 @@ onAuthStateChanged(auth, (user) => {
                         console.log(profileUsername)
                         profileUsername.innerHTML = docSnap.data().signup_user_name;
                         profileEmail.innerHTML = docSnap.data().signup_email;
+                        profileImage.src = docSnap.data().photoUrl
                         console.log("Current data------>: ", docSnap.data());
                     }
                     // console.log(uid)
@@ -400,6 +409,7 @@ if (location.pathname == "/dashboard.html") {
                         blog_description: quill.root.innerHTML,
                         user_uid: doc.data().user_uid,
                         user_name: doc.data().signup_user_name,
+                        photoUrl : doc.data().photoUrl
 
                     });
                     getBlogData(auth.currentUser.uid)
